@@ -30,7 +30,7 @@ model people {
   state                 String
   pin_code              String
   pub_key               String?
-  registration_complete Boolean          @default(false)
+  verification_complete Boolean          @default(false)
   verification_id       String
   role                  Role[]
   created_at            DateTime         @default(now())

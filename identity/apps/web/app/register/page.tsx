@@ -9,7 +9,7 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useState } from "react";
 import Image from "next/image";
 import { RegisterAction } from "../actions/database";
-
+import { Loader2 } from "lucide-react";
 const formSchema = z.object({
   firstName: z.string().min(5, { message: "This field has to be filled." }),
   middleName: z.string().optional(),
@@ -41,6 +41,7 @@ type Inputs = z.infer<typeof formSchema>;
 
 export default function RegisterForm() {
   const {
+    handleSubmit,
     register,
     formState: { errors, isSubmitting },
     control,
@@ -55,20 +56,19 @@ export default function RegisterForm() {
     },
   });
   const [file, setFile] = useState<File | null>(null);
-  const onSubmit: SubmitHandler<Inputs> = async (InputFormData) => {};
+  const onSubmit: SubmitHandler<Inputs> = async (InputFormData) => {
+    // const res = await RegisterAction(InputFormData);
+    // if (!res.success) {
+    //   alert("Submission failed");
+    // }
+    // alert("Submission successful");
+    console.log(InputFormData);
+  };
 
   return (
     <div className="grid grid-cols-2 h-screen bg-slate-200">
       <div className="flex justify-center items-center">
-        <form
-          className=""
-          // onSubmit={handleSubmit(onSubmit)}
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const res = await RegisterAction();
-            alert(res.msg);
-          }}
-        >
+        <form className="" onSubmit={handleSubmit(onSubmit)}>
           <div>
             <Label htmlFor="firstName">
               First Name<span className="font-light text-red-600">*</span>
@@ -207,7 +207,13 @@ export default function RegisterForm() {
             />
             {errors.dob && <p className="text-red-500">{errors.dob.message}</p>}
           </div>
-          <Button type="submit">Submit</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              "Submit"
+            )}
+          </Button>
         </form>
         {errors.root && <p className="text-red-500">Submission Error</p>}
       </div>
