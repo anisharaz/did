@@ -64,7 +64,7 @@ export const RegistrationEmailTemple = ({
   );
 };
 
-export default RegistrationEmail;
+export default RegistrationEmailTemple;
 
 const main = {
   backgroundColor: "#f6f9fc",
