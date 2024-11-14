@@ -1,9 +1,14 @@
-import { Button } from "@/components/ui/button";
+import WalletButton from "@/components/ui/WalletButton";
+
 function Home() {
   return (
-    <div className="text-red-600">
-      Hello world <br />
-      <Button>Click me</Button>
+    <div className="min-h-16 shadow-lg flex items-center">
+      <div className="flex-1">
+        <div>LOGO</div>
+      </div>
+      <div>
+        <WalletButton />
+      </div>
     </div>
   );
 }
