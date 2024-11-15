@@ -95,8 +95,9 @@ pub(crate) fn init_multisig_action(
             in_progress_multisig,
         )?;
     } else {
-        let mut in_progress_multisig: states::InProcessMultiSig =
-            in_progress_multisig_account_pda.deserialize_data().unwrap();
+        let mut in_progress_multisig = states::InProcessMultiSig::try_from_slice(
+            &in_progress_multisig_account_pda.data.borrow(),
+        )?;
         if in_progress_multisig.actions.contains(&action_id) {
             panic!("In Progress Exists");
         }

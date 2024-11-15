@@ -2,11 +2,13 @@ use borsh::BorshDeserialize;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
+    msg,
 };
 
 use crate::{helper, states};
 
 pub(crate) fn vote_multisig_action(accounts: &[AccountInfo], vote: bool) -> ProgramResult {
+    msg!("MSG: Here I am 1");
     let account_iter = &mut accounts.iter();
     let voter = next_account_info(account_iter)?;
     let multisig_voting_account_pda = next_account_info(account_iter)?;

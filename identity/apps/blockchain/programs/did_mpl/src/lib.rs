@@ -70,7 +70,7 @@ pub mod entrypoint {
                 )?;
             }
             Ok(RequestData::VoteMultiSigAction { vote }) => {
-                instructions::vote_multisig_action(_accounts, vote);
+                instructions::vote_multisig_action(_accounts, vote)?;
             }
             _ => {
                 msg!("Bad request")

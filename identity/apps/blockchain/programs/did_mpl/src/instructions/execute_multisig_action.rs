@@ -30,10 +30,13 @@ pub(crate) fn execute_multisig_action(accounts: &[AccountInfo]) -> ProgramResult
         states::MultiSigVoting::try_from_slice(&multisig_voting_account_pda.data.borrow())?;
     let mut vote_count = 0;
     for (_, value) in multisig_voting.vote_by_signers.into_iter() {
+        msg!("vote! {:?}", value);
         if value.unwrap_or(false) {
             vote_count += 1;
         }
     }
+    msg!("Votes: {:?}", vote_count);
+    msg!("Minimal sign: {:?}", multisig.minimum_number_of_signs);
 
     if vote_count < multisig.minimum_number_of_signs {
         panic!("Immature execution");
