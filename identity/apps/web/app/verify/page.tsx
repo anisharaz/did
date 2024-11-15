@@ -7,7 +7,9 @@ async function VerifyRegistration({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const reg_id = (await searchParams).reg_id;
+  const reg_id = (await searchParams)?.reg_id;
+  console.log(searchParams);
+
   const people = await prisma.people.findUnique({
     where: {
       registration_id: reg_id as string,

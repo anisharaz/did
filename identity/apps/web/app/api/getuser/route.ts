@@ -11,11 +11,13 @@ export async function POST(request: NextRequest) {
     return new Response("Bad Request", { status: 400 });
   }
   const result = nacl.sign.detached.verify(
-    data.signature,
+    new TextEncoder().encode(data.public_key),
     // @ts-ignore
     new Uint8Array(data.signature.data),
-    new PublicKey(data.public_key).toBytes()
+    new PublicKey(data.public_key).toBuffer()
   );
+  console.log(result);
+
   if (!result) {
     return new Response("Unauthorized", { status: 401 });
   }

@@ -69,7 +69,7 @@ export default function RegisterForm() {
   // TODO: add the id in all input for Label
   // TODO: ability to upload image
   return (
-    <div className="grid grid-cols-2 text-white h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+    <div className="grid grid-cols-2  h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
       <div className="">
         <div>
           <div className="text-4xl font-bold p-4">Enter People detail</div>

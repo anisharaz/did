@@ -54,6 +54,7 @@ export async function RegisterAction({
       to: email,
       href: `${process.env.BASE_URL}/verify?reg_id=${res.registration_id}`,
     });
+    console.log(res);
     return {
       success: true,
       msg: "Registration successful",

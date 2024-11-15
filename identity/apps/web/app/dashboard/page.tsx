@@ -1,12 +1,67 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Eye } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
+// import WalletButton from "@/components/ui/WalletButton";
 
 export default function LandingPage() {
+  const { publicKey, connected, signMessage, connect } = useWallet();
+
   const [isDocumentedAdded, setIsDocumentAdded] = useState(false);
   const [isDocumentViewed, setIsDocumentViewed] = useState(false);
+  const [userDetails, setUserDetails] = useState({});
+
+  const fetchUserData = async () => {
+    if (!connected) {
+      await connect();
+    }
+
+    if (publicKey && signMessage) {
+      try {
+        const publicKeyString = publicKey.toString();
+        console.log("Public Key:", publicKeyString);
+
+        const userData_At_LocalStorage = localStorage.getItem("user");
+        if (userData_At_LocalStorage) {
+          console.log(
+            "User Data from Local Storage:",
+            userData_At_LocalStorage
+          );
+          return;
+        }
+
+        const signedMessage = await signMessage(
+          new TextEncoder().encode(publicKeyString)
+        );
+
+        const response = await fetch("http://localhost:3000/api/getuser", {
+          method: "POST",
+          body: JSON.stringify({
+            public_key: publicKeyString,
+            signature: signedMessage as Uint8Array,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("User Data from API:", data);
+          setUserDetails(data);
+
+          localStorage.setItem("user", JSON.stringify(data));
+        } else {
+          console.error("Failed to fetch user data:", await response.text());
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   return (
     <main>
@@ -15,14 +70,17 @@ export default function LandingPage() {
           <h1 className="text-3xl font-bold mb-1">My Profile</h1>
           <div className="flex gap-6">
             <button
-              className="bg-blue-600 px-2 py-1 text-white rounded-md"
+              className={
+                isDocumentedAdded
+                  ? "invisible"
+                  : "bg-blue-600 px-2 py-1 text-white rounded-md"
+              }
               onClick={(e) => {
                 e.preventDefault();
                 setIsDocumentAdded(true);
               }}
             >
-              <span> + </span>
-              {isDocumentedAdded ? "" : "Add documents"}
+              {isDocumentedAdded ? "" : " + Add documents"}
             </button>
             <button
               className="flex bg-blue-600 px-3 py-1 text-white rounded-md"
