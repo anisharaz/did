@@ -25,9 +25,11 @@ function Home() {
 
   return (
     <main className="bg-[url('https://static.aaraz.me/did/bg.jpeg')] bg-[length:110%_110%] min-h-screen font-mono" style={{ backgroundPosition: w + "% " + h + "%" }}>
-      <AppBar />
+      <div className="z-[20] fixed w-screen">
+        <AppBar />
+      </div>
       {/* text description */}
-      <div className="h-screen w-screen fixed top-0 left-0 flex flex-col items-center justify-center">
+      <div className="h-screen w-screen fixed top-0 left-0 flex flex-col items-center justify-center z-[0] ">
         <h1
           className=" text-8xl font-extrabold text-center"
           style={{
