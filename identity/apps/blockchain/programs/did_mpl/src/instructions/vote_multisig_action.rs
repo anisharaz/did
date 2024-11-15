@@ -18,6 +18,8 @@ pub(crate) fn vote_multisig_action(accounts: &[AccountInfo], vote: bool) -> Prog
         if !perm.contains(&states::Permission::Vote {}) {
             panic!("Unauthorized");
         }
+    } else {
+        panic!("Unauthorized");
     }
 
     let mut multising_voting =

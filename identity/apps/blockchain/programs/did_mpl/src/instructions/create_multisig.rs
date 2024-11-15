@@ -1,6 +1,7 @@
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
+    msg,
     pubkey::Pubkey,
 };
 use std::collections::HashMap;
@@ -23,8 +24,17 @@ pub(crate) fn create_card_account(
 
     // For MultiSig Account
     let mut signers: HashMap<Pubkey, Vec<states::Permission>> = HashMap::new();
+    signers.insert(
+        creator.key.to_owned(),
+        vec![
+            states::Permission::Initiate {},
+            states::Permission::Vote {},
+            states::Permission::Execute {},
+        ],
+    );
 
     for (account, permission) in account_iter.zip(permissions.iter()) {
+        msg!("recorded: {:?} {:?}", account, permission);
         signers.insert(account.key.to_owned(), permission.to_owned());
     }
 

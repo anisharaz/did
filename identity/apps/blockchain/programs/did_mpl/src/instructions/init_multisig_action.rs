@@ -30,6 +30,8 @@ pub(crate) fn init_multisig_action(
         if !perm.contains(&states::Permission::Initiate {}) {
             panic!("Unauthorized");
         }
+    } else {
+        panic!("Unauthorized");
     }
 
     // For Action Account

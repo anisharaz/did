@@ -22,6 +22,8 @@ pub(crate) fn execute_multisig_action(accounts: &[AccountInfo]) -> ProgramResult
         if !perm.contains(&states::Permission::Execute {}) {
             panic!("Unauthorized");
         }
+    } else {
+        panic!("Unauthorized");
     }
 
     let multisig_voting =
