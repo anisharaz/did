@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 // import Image from "next/image";
 
 function Home() {
-  const [w, setW] = useState(8);
-  const [h, setH] = useState(8);
+  const [w, setW] = useState(11);
+  const [h, setH] = useState(11);
 
   useEffect(() => {
     const handleWindowMouseMove = event => {
@@ -41,8 +41,8 @@ function Home() {
         >
           Decentralized Identification(DID)
         </h1>
-        <p className="text-black text-xl text-center w-2/3 mt-4 font-extrabold">
-          <mark className="animate-gradient-x bg-gradient-to-r from-blue-500 via-red-200 to-green-500">
+        <p className="text-black text-2xl text-center w-2/3 mt-4 font-extrabold">
+          <mark className="animate-gradient-x bg-gradient-to-r from-blue-500 via-red-200 to-green-500  rounded-sm">
             This is a decentralised way to store data and prevent unauthorised
             access and hence prevent tampering of dapinkta
           </mark>
