@@ -23,11 +23,13 @@ const tx = new Transaction({
 });
 
 const [multisig_account_pda, multisig_account_bump] = PublicKey.findProgramAddressSync(
+  // Public key of owner of Multisig 
   [keyPair.publicKey.toBuffer(), "multisig_account_pda"],
   programId,
 );
 
 const [multisig_vault_account_pda, multisig_vault_account_bump] = PublicKey.findProgramAddressSync(
+  // Public key of owner of Multisig 
   [keyPair.publicKey.toBuffer(), "multisig_vault_account_pda"],
   programId,
 );
@@ -36,7 +38,6 @@ const [multisig_vault_account_pda, multisig_vault_account_bump] = PublicKey.find
 const data = {
   CreateMultiSig: {
     permissions: [
-      [{ Initiate: {} }, { Vote: {} }, { Execute: {} },],
       [{ Initiate: {} }, { Vote: {} }, { Execute: {} },],
     ],
     minimum_number_of_signs_for_update: 1,

@@ -10,6 +10,10 @@ import * as borsh from "borsh";
 import { requestSchema } from "./schemas.js";
 import * as process from "process";
 
+/*
+ * Notification about proposal can be sent offchain by client
+ */
+
 const programId = new PublicKey(process.env.PROG);
 
 const connection = new Connection("http://localhost:8899", "confirmed");
@@ -23,29 +27,32 @@ const tx = new Transaction({
 });
 
 const [multisig_account_pda, multisig_account_bump] = PublicKey.findProgramAddressSync(
+  // Public key of owner of Multisig 
   [keyPair.publicKey.toBuffer(), "multisig_account_pda"],
   programId,
 );
 
 const [multisig_action_account_pda, multisig_action_account_bump] = PublicKey.findProgramAddressSync(
-  [keyPair.publicKey.toBuffer(), "multisig_action_account_pda", "action_id"],
+  // Public key of Proposer 
+  [keyPair.publicKey.toBuffer(), "multisig_action_account_pda", "action_id<prefered uuid>"],
   programId,
 );
 
 const [multisig_voting_account_pda, multisig_voting_account_bump] = PublicKey.findProgramAddressSync(
-  [keyPair.publicKey.toBuffer(), "multisig_voting_account_pda", "action_id"],
+  // Public key of Proposer 
+  [keyPair.publicKey.toBuffer(), "multisig_voting_account_pda", "action_id<prefered uuid>"],
   programId,
 );
 
-
 const [in_progress_multisig_account_pda, in_progress_multisig_account_bump] = PublicKey.findProgramAddressSync(
+  // Public key of owner of Multisig 
   [keyPair.publicKey.toBuffer(), "in_progress_multisig_account_pda"],
   programId,
 );
 
 const data = {
   InitMultiSigAction: {
-    action_id: "action_id",
+    action_id: "action_id<prefered uuid>",
     action: { UpdateMinimumNumberOfSigns: { value: 0 } },
     multisig_action_account_bump: multisig_action_account_bump,
     multisig_voting_account_bump: multisig_voting_account_bump,

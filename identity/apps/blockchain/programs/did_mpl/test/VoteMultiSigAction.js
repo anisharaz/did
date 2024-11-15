@@ -23,12 +23,14 @@ const tx = new Transaction({
 });
 
 const [multisig_account_pda, multisig_account_bump] = PublicKey.findProgramAddressSync(
+  // Public key of owner of Multisig 
   [keyPair.publicKey.toBuffer(), "multisig_account_pda"],
   programId,
 );
 
 
 const [multisig_voting_account_pda, multisig_voting_account_bump] = PublicKey.findProgramAddressSync(
+  // Public key of Proposer 
   [keyPair.publicKey.toBuffer(), "multisig_voting_account_pda", "action_id"],
   programId,
 );
