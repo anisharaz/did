@@ -1,6 +1,7 @@
 import WalletConnectPipe from "@/app/pipes/WalletConnectionPipe";
 import prisma from "@/lib/db";
 import VerifyRegistrationButton from "./VerifyButton";
+import { Button } from "@/components/ui/button";
 
 async function VerifyRegistration({
   searchParams,
@@ -26,7 +27,14 @@ async function VerifyRegistration({
     <div className="flex justify-center ">
       <WalletConnectPipe title="Connect Wallet To continue verification">
         {people?.verification_complete ? (
-          <div>Verification Complete</div>
+          <div className="text-4xl">
+            Verification Complete{" "}
+            <a href="/">
+              <Button variant={"link"} className="text-4xl text-blue-400">
+                Click Here
+              </Button>
+            </a>
+          </div>
         ) : (
           <VerifyRegistrationButton registration_id={reg_id as string} />
         )}

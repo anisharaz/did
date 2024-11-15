@@ -71,9 +71,11 @@ export async function RegisterAction({
 export async function VerifyRegistrationAction({
   registration_id,
   public_key,
+  registration_tx_signature,
 }: {
   registration_id: string;
   public_key: string;
+  registration_tx_signature: string;
 }) {
   const people = await prisma.people.findUnique({
     where: {
@@ -100,8 +102,10 @@ export async function VerifyRegistrationAction({
       data: {
         pub_key: public_key,
         verification_complete: true,
+        registration_tx_signature: registration_tx_signature,
       },
     });
+
     return {
       success: true,
       msg: "Verification successful",

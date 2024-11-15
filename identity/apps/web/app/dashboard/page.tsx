@@ -43,7 +43,7 @@ export default function LandingPage() {
             signature: signedMessage as Uint8Array,
           }),
         });
-
+        // TODO: fall ui of the user is not found
         if (response.ok) {
           const data = await response.json();
           console.log("User Data from API:", data);
