@@ -5,10 +5,11 @@ import {
   Connection,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { ProgramId } from "./common";
+import { GetUserBasicDetail, ProgramId } from "./common";
 import { requestSchema } from "./OnChainDataSchema";
 import * as borsh from "borsh";
 import { GovernBody, Nominee, JudicialBody } from "./Wallets";
+
 export async function CreateUserOnChainData({
   public_key,
   identity_hash,
@@ -101,6 +102,116 @@ export async function CreateUserOnChainData({
         },
       ],
       data: Buffer.from(EncodedData),
+    })
+  );
+  return tx;
+}
+
+export async function Create_UserDetailUpdate_MultiSigAction({
+  proposer_public_key,
+  accound_holder_public_key,
+  tempUUID,
+  Connection,
+  data_hash,
+}: {
+  proposer_public_key: PublicKey;
+  accound_holder_public_key: PublicKey;
+  tempUUID: string;
+  Connection: Connection;
+  data_hash: string;
+}): Promise<Transaction> {
+  const LatestBlock = await Connection.getLatestBlockhash();
+  const tx = new Transaction({
+    ...LatestBlock,
+  });
+  const [multisig_account_pda, multisig_account_bump] =
+    PublicKey.findProgramAddressSync(
+      // Public key of owner of Multisig
+      [
+        accound_holder_public_key.toBuffer(),
+        Buffer.from("multisig_account_pda", "utf-8"),
+      ],
+      ProgramId
+    );
+
+  const [multisig_action_account_pda, multisig_action_account_bump] =
+    PublicKey.findProgramAddressSync(
+      // Public key of Proposer
+      [
+        proposer_public_key.toBuffer(),
+        Buffer.from("multisig_action_account_pda", "utf-8"),
+        Buffer.from(tempUUID, "utf-8"),
+      ],
+      ProgramId
+    );
+
+  const [multisig_voting_account_pda, multisig_voting_account_bump] =
+    PublicKey.findProgramAddressSync(
+      // Public key of Proposer
+      [
+        proposer_public_key.toBuffer(),
+        Buffer.from("multisig_voting_account_pda"),
+        Buffer.from(tempUUID, "utf-8"),
+      ],
+      ProgramId
+    );
+  const [in_progress_multisig_account_pda, in_progress_multisig_account_bump] =
+    PublicKey.findProgramAddressSync(
+      // Public key of owner of Multisig
+      [
+        proposer_public_key.toBuffer(),
+        Buffer.from("in_progress_multisig_account_pda", "utf-8"),
+      ],
+      ProgramId
+    );
+  const data = {
+    InitMultiSigAction: {
+      action_id: tempUUID,
+      action: { UpdateIdentityCardHash: { hash: data_hash } },
+      multisig_action_account_bump: multisig_action_account_bump,
+      multisig_voting_account_bump: multisig_voting_account_bump,
+      in_progress_multisig_account_bump: in_progress_multisig_account_bump,
+    },
+  };
+  //@ts-ignore
+  const encoded = borsh.serialize(requestSchema, data);
+
+  tx.add(
+    new TransactionInstruction({
+      programId: ProgramId,
+      keys: [
+        {
+          pubkey: proposer_public_key,
+          isSigner: true,
+          isWritable: true,
+        },
+        {
+          pubkey: multisig_action_account_pda,
+          isSigner: false,
+          isWritable: true,
+        },
+        {
+          pubkey: multisig_voting_account_pda,
+          isSigner: false,
+          isWritable: true,
+        },
+        {
+          pubkey: in_progress_multisig_account_pda,
+          isSigner: false,
+          isWritable: true,
+        },
+        {
+          pubkey: multisig_account_pda,
+          isSigner: false,
+          isWritable: true,
+        },
+        {
+          pubkey: SystemProgram.programId,
+          isSigner: false,
+          isWritable: false,
+        },
+      ],
+      data: Buffer.from(encoded),
     })
   );
   return tx;

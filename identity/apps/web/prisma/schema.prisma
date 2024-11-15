@@ -60,6 +60,31 @@ enum access_request_status {
   rejected
 }
 
+enum action_type {
+  UpdateSigners
+  UpdateMinimumNumberOfSigns
+  UpdateIdentityCardHash
+  AddAssetHash
+  RemoveAssetHash
+  Delete
+}
+
+model multisig_action {
+  id                  String      @id @default(cuid())
+  action_id           String      @unique
+  action_type         action_type
+  creator_pub_key     String
+  created_at          DateTime    @default(now())
+  updated_at          DateTime    @updatedAt
+  creation_tx         String?
+  execution_tx        String?
+  executor_pub_key    String?
+  user_involved       Boolean
+  government_involved Boolean
+  judicial_involved   Boolean
+  nominee_involved    Boolean
+}
+
 model access_request {
   id                String                @id @default(cuid())
   status            access_request_status @default(pending)

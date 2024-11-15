@@ -118,3 +118,74 @@ export async function VerifyRegistrationAction({
     };
   }
 }
+
+export async function CreateMultiSigAction({
+  id,
+  creator_pub_key,
+}: {
+  id: string;
+  creator_pub_key: string;
+}) {
+  const res = await prisma.multisig_action.create({
+    data: {
+      action_id: id,
+      creator_pub_key: creator_pub_key,
+      action_type: "UpdateIdentityCardHash",
+      user_involved: true,
+      government_involved: true,
+      nominee_involved: false,
+      judicial_involved: false,
+    },
+  });
+  return {
+    success: true,
+    msg: "Action created",
+  };
+}
+
+export async function UpdateActionCreation_tx({
+  creation_tx,
+  action_id,
+}: {
+  creation_tx: string;
+  action_id: string;
+}) {
+  await prisma.multisig_action.update({
+    where: {
+      id: action_id,
+    },
+    data: {
+      creation_tx: creation_tx,
+    },
+  });
+  return {
+    success: true,
+    msg: "Creation tx added",
+  };
+}
+
+export async function UpdateUserData({
+  public_key,
+  phone,
+}: {
+  public_key: string;
+  phone: string;
+}) {
+  const people = await prisma.people.findFirst({
+    where: {
+      pub_key: public_key,
+    },
+  });
+  const res = await prisma.people.update({
+    where: {
+      id: people?.id,
+    },
+    data: {
+      phone: phone,
+    },
+  });
+  return {
+    success: true,
+    msg: "Phone number updated",
+  };
+}
