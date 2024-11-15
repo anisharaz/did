@@ -1,3 +1,4 @@
+use borsh::BorshDeserialize;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
@@ -14,15 +15,16 @@ pub(crate) fn execute_multisig_action(accounts: &[AccountInfo]) -> ProgramResult
     let multisig_vault_account_pda = next_account_info(account_iter)?;
     let in_progress_multisig_account_pda = next_account_info(account_iter)?;
 
-    let multisig: states::MultiSig = multisig_account_pda.deserialize_data().unwrap();
+    let mut multisig = states::MultiSig::try_from_slice(&multisig_account_pda.data.borrow())?;
 
     if let Some(perm) = multisig.signers.get(executor.key) {
-        if !perm.contains(&states::Permission::Execute) {
+        if !perm.contains(&states::Permission::Execute {}) {
             panic!("Unauthorized");
         }
     }
 
-    let multisig_voting: states::MultiSigVoting = multisig_account_pda.deserialize_data().unwrap();
+    let multisig_voting =
+        states::MultiSigVoting::try_from_slice(&multisig_voting_account_pda.data.borrow())?;
     let mut vote_count = 0;
     for (_, value) in multisig_voting.vote_by_signers.into_iter() {
         if value.unwrap_or(false) {
@@ -34,27 +36,25 @@ pub(crate) fn execute_multisig_action(accounts: &[AccountInfo]) -> ProgramResult
         panic!("Immature execution");
     }
 
-    let multisig_action: states::MultiSigAction =
-        multisig_action_account_pda.deserialize_data().unwrap();
+    let multisig_action =
+        states::MultiSigAction::try_from_slice(&multisig_action_account_pda.data.borrow())?;
 
     match multisig_action.action {
-        states::Action::UpdateSigners(data) => {
-            let mut multising: states::MultiSig = multisig_account_pda.deserialize_data().unwrap();
-            multising.signers = data;
-            helper::update_pda_account(executor, multisig_account_pda, multising)?;
+        states::Action::UpdateSigners { signers } => {
+            multisig.signers = signers;
+            helper::update_pda_account(executor, multisig_account_pda, multisig)?;
         }
-        states::Action::UpdateIdentityCardHash(data) => {
-            let mut multising_vault: states::MultiSigVault =
-                multisig_vault_account_pda.deserialize_data().unwrap();
-            multising_vault.identity_card_hash = data;
+        states::Action::UpdateIdentityCardHash { hash } => {
+            let mut multising_vault =
+                states::MultiSigVault::try_from_slice(&multisig_vault_account_pda.data.borrow())?;
+            multising_vault.identity_card_hash = hash;
             helper::update_pda_account(executor, multisig_vault_account_pda, multising_vault)?;
         }
-        states::Action::UpdateMinimumNumberOfSigns(data) => {
-            let mut multising: states::MultiSig = multisig_account_pda.deserialize_data().unwrap();
-            multising.minimum_number_of_signs = data;
-            helper::update_pda_account(executor, multisig_account_pda, multising)?;
+        states::Action::UpdateMinimumNumberOfSigns { value } => {
+            multisig.minimum_number_of_signs = value;
+            helper::update_pda_account(executor, multisig_account_pda, multisig)?;
         }
-        states::Action::Delete => {
+        states::Action::Delete {} => {
             let lamports = multisig_account_pda.lamports();
             **multisig_account_pda.try_borrow_mut_lamports()? -= lamports;
             **executor.try_borrow_mut_lamports()? += lamports;
@@ -65,8 +65,9 @@ pub(crate) fn execute_multisig_action(accounts: &[AccountInfo]) -> ProgramResult
         }
     }
 
-    let mut in_progress_multisig: states::InProcessMultiSig =
-        in_progress_multisig_account_pda.deserialize_data().unwrap();
+    let mut in_progress_multisig =
+        states::InProcessMultiSig::try_from_slice(&in_progress_multisig_account_pda.data.borrow())?;
+
     in_progress_multisig
         .actions
         .retain(|x| *x != multisig_action.action_id);

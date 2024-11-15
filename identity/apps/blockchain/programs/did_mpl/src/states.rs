@@ -1,14 +1,15 @@
 use std::collections::HashMap;
 
+use crate::states;
 use borsh::{BorshDeserialize, BorshSerialize};
 use serde::Deserialize;
 use solana_program::pubkey::Pubkey;
 
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, PartialEq, Debug, Clone)]
 pub(crate) enum Permission {
-    Initiate,
-    Vote,
-    Execute,
+    Initiate {},
+    Vote {},
+    Execute {},
 }
 
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Debug)]
@@ -29,14 +30,20 @@ pub(crate) struct MultiSigVault {
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Debug)]
 pub(crate) enum Action {
     // MultiSig
-    UpdateSigners(HashMap<Pubkey, Vec<Permission>>),
-    UpdateMinimumNumberOfSigns(u32),
+    UpdateSigners {
+        signers: HashMap<Pubkey, Vec<states::Permission>>,
+    },
+    UpdateMinimumNumberOfSigns {
+        value: u32,
+    },
 
     // Vault
-    UpdateIdentityCardHash(String),
+    UpdateIdentityCardHash {
+        hash: String,
+    },
 
     // Common
-    Delete,
+    Delete {},
 }
 
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Debug)]

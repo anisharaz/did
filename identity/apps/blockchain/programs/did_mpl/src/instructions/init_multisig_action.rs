@@ -1,3 +1,4 @@
+use borsh::BorshDeserialize;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
@@ -23,10 +24,10 @@ pub(crate) fn init_multisig_action(
     let in_progress_multisig_account_pda = next_account_info(account_iter)?;
     let multisig_account_pda = next_account_info(account_iter)?;
 
-    let multisig: states::MultiSig = multisig_account_pda.deserialize_data().unwrap();
+    let multisig = states::MultiSig::try_from_slice(&multisig_account_pda.data.borrow())?;
 
     if let Some(perm) = multisig.signers.get(creator.key) {
-        if !perm.contains(&states::Permission::Initiate) {
+        if !perm.contains(&states::Permission::Initiate {}) {
             panic!("Unauthorized");
         }
     }
@@ -43,11 +44,14 @@ pub(crate) fn init_multisig_action(
         &creator,
         &multisig_action_account_pda,
         multisig_action_account_bump,
+        b"multisig_action_account_pda",
+        Some(action_id.as_bytes()),
         multisig_action,
     )?;
 
     // For Voting Account
     let mut vote_by_signers: HashMap<Pubkey, Option<bool>> = HashMap::new();
+    vote_by_signers.insert(creator.key.to_owned(), None);
 
     for account in account_iter {
         vote_by_signers.insert(account.key.to_owned(), None);
@@ -64,6 +68,8 @@ pub(crate) fn init_multisig_action(
         &creator,
         &multisig_voting_account_pda,
         multisig_voting_account_bump,
+        b"multisig_voting_account_pda",
+        Some(action_id.as_bytes()),
         multisig_voting,
     )?;
 
@@ -82,6 +88,8 @@ pub(crate) fn init_multisig_action(
             &creator,
             &in_progress_multisig_account_pda,
             in_progress_multisig_account_bump,
+            b"in_progress_multisig_account_pda",
+            None,
             in_progress_multisig,
         )?;
     } else {

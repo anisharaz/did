@@ -11,7 +11,7 @@ pub(crate) fn create_card_account(
     program_id: &Pubkey,
     accounts: &[AccountInfo],
     permissions: Vec<Vec<states::Permission>>,
-    minimum_number_of_signs_for_update: u32,
+    minimum_number_of_signs: u32,
     identity_card_hash: String,
     multisig_account_bump: u8,
     multisig_vault_account_bump: u8,
@@ -32,7 +32,7 @@ pub(crate) fn create_card_account(
         bump: multisig_account_bump,
         creator: creator.key.to_owned(),
         signers,
-        minimum_number_of_signs: minimum_number_of_signs_for_update,
+        minimum_number_of_signs,
     };
 
     helper::create_pda_account(
@@ -40,6 +40,8 @@ pub(crate) fn create_card_account(
         &creator,
         &multisig_account_pda,
         multisig_account_bump,
+        b"multisig_account_pda",
+        None,
         multisig,
     )?;
 
@@ -55,6 +57,8 @@ pub(crate) fn create_card_account(
         &creator,
         &multisig_vault_account_pda,
         multisig_vault_account_bump,
+        b"multisig_vault_account_pda",
+        None,
         multisig_vault,
     )?;
     Ok(())

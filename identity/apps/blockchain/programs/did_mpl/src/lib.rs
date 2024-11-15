@@ -4,6 +4,7 @@ pub(crate) mod states;
 
 #[cfg(not(feature = "no-entrypoint"))]
 pub mod entrypoint {
+
     use borsh::{BorshDeserialize, BorshSerialize};
     use solana_program::{
         account_info::AccountInfo, entrypoint::ProgramResult, msg, program_error::ProgramError,
@@ -20,10 +21,15 @@ pub mod entrypoint {
         _instruction_data: &[u8],
     ) -> ProgramResult {
         let command = RequestData::try_from_slice(_instruction_data);
+        // msg!("checkpoint 2");
+        // msg!("{:?}", command);
 
         #[allow(unused)]
         match command {
-            Err(_) => return Err(ProgramError::InvalidArgument),
+            Err(e) => {
+                return Err(ProgramError::InvalidArgument);
+                panic!("{:?}", e);
+            }
             Ok(RequestData::CreateMultiSig {
                 permissions,
                 minimum_number_of_signs_for_update,
@@ -31,6 +37,7 @@ pub mod entrypoint {
                 multisig_account_bump,
                 multisig_vault_account_bump,
             }) => {
+                // msg!("Accounts: {:?}", _accounts);
                 instructions::create_card_account(
                     _program_id,
                     _accounts,
@@ -41,7 +48,7 @@ pub mod entrypoint {
                     multisig_vault_account_bump,
                 )?;
             }
-            Ok(RequestData::ExecuteMultiSigAction) => {
+            Ok(RequestData::ExecuteMultiSigAction {}) => {
                 instructions::execute_multisig_action(_accounts)?;
             }
             Ok(RequestData::InitMultiSigAction {
@@ -51,6 +58,7 @@ pub mod entrypoint {
                 multisig_voting_account_bump,
                 in_progress_multisig_account_bump,
             }) => {
+                // msg!("Checkpoint 1");
                 instructions::init_multisig_action(
                     _program_id,
                     _accounts,
@@ -84,7 +92,7 @@ pub mod entrypoint {
         },
         // executor, multisig_action_account_pda, multisig_voting_account_pda,
         // multisig_account_pda, multisig_vault_account_pda, in_progress_multisig_account_pda
-        ExecuteMultiSigAction,
+        ExecuteMultiSigAction {},
         // creator, multisig_action_account_pda, multisig_voting_account_pda,
         // in_progress_multisig_account_pda, multisig_account_pda
         InitMultiSigAction {
