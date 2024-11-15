@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { CreateUserOnChainData } from "../actions/lib/blockchain";
 import { PublicKey } from "@solana/web3.js";
 import axios from "axios";
+
 function VerifyRegistrationButton({
   registration_id,
 }: {

@@ -37,8 +37,10 @@ export default function Modal() {
     try {
       setDocumentDetails(InputFormData);
       console.log(InputFormData);
+      alert("Document added successfully!");
     } catch (error) {
       console.log(error);
+      alert("Something went wrong!, please try again later");
     }
     // action to be implemented
   };
@@ -86,7 +88,6 @@ export default function Modal() {
             <option value="Voter ID card">Voter ID Card</option>
           </select>
         </div>
-
         <button
           type="submit"
           className="bg-black w-36 px-6 py-2 text-white rounded-md ml-28"
