@@ -23,15 +23,18 @@ model people {
   middle_name           String?
   last_name             String
   email                 String
-  password              String
+  password              String?
   phone                 String
-  address               String
+  address_line          String
   city                  String
   state                 String
-  pin_code              String
+  pin_code              Int
+  dob                   DateTime
+  photo                 String
+  gender                String
   pub_key               String?
   verification_complete Boolean          @default(false)
-  verification_id       String
+  registration_id       String           @unique
   role                  Role[]
   created_at            DateTime         @default(now())
   updated_at            DateTime         @updatedAt

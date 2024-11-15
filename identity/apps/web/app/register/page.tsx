@@ -11,9 +11,9 @@ import Image from "next/image";
 import { RegisterAction } from "../actions/database";
 import { Loader2 } from "lucide-react";
 const formSchema = z.object({
-  firstName: z.string().min(5, { message: "This field has to be filled." }),
+  firstName: z.string().min(2, { message: "This field has to be filled." }),
   middleName: z.string().optional(),
-  lastName: z.string().min(5, { message: "This field has to be filled." }),
+  lastName: z.string().min(2, { message: "This field has to be filled." }),
   dob: z.date({ message: "Enter your DOB" }),
   gender: z
     .string({ message: "Gender is required" })
@@ -31,10 +31,11 @@ const formSchema = z.object({
     .string()
     .min(1, { message: "This field has to be filled." })
     .email({ message: "This is not a valid email" }),
-  photo: z
-    .any()
-    .refine((file) => file?.size <= 3000000, "Max image size is 3MB."),
-  address: z.string().min(5, { message: "This field has to be filled." }),
+  photo: z.string().url({ message: "This is not a valid URL" }),
+  address_line: z.string().min(5, { message: "This field has to be filled." }),
+  city: z.string().min(5, { message: "City is required" }),
+  state: z.string().min(5, { message: "State is required" }),
+  pin_code: z.number().int({ message: "Valid pincode required" }),
 });
 
 type Inputs = z.infer<typeof formSchema>;
@@ -47,7 +48,7 @@ export default function RegisterForm() {
     control,
     setValue,
     clearErrors,
-    getValues,
+    reset,
   } = useForm<Inputs>({
     mode: "onChange",
     resolver: zodResolver(formSchema),
@@ -57,18 +58,20 @@ export default function RegisterForm() {
   });
   const [file, setFile] = useState<File | null>(null);
   const onSubmit: SubmitHandler<Inputs> = async (InputFormData) => {
-    // const res = await RegisterAction(InputFormData);
-    // if (!res.success) {
-    //   alert("Submission failed");
-    // }
-    // alert("Submission successful");
-    console.log(InputFormData);
+    const res = await RegisterAction(InputFormData);
+    if (!res.success) {
+      alert("Submission failed");
+      return;
+    }
+    alert("Submission successful");
+    reset();
   };
-
+  // TODO: add the id in all input for Label
+  // TODO: ability to upload image
   return (
-    <div className="grid grid-cols-2 h-screen bg-slate-200">
+    <div className="grid grid-cols-2 h-screen bg-slate-100">
       <div className="flex justify-center items-center">
-        <form className="" onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div>
             <Label htmlFor="firstName">
               First Name<span className="font-light text-red-600">*</span>
@@ -137,11 +140,43 @@ export default function RegisterForm() {
           </div>
           <div>
             <Label htmlFor="address">
-              Address<span className="font-light text-red-600">*</span>
+              Address Line<span className="font-light text-red-600">*</span>
             </Label>
-            <Input type="text" {...register("address")} />
-            {errors.address && (
-              <p className="text-red-500">{errors.address.message}</p>
+            <Input type="text" {...register("address_line")} />
+            {errors.address_line && (
+              <p className="text-red-500">{errors.address_line.message}</p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="address">
+              State<span className="font-light text-red-600">*</span>
+            </Label>
+            <Input type="text" {...register("state")} />
+            {errors.state && (
+              <p className="text-red-500">{errors.state.message}</p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="address">
+              City<span className="font-light text-red-600">*</span>
+            </Label>
+            <Input type="text" {...register("city")} />
+            {errors.city && (
+              <p className="text-red-500">{errors.city.message}</p>
+            )}
+          </div>
+          <div>
+            <Label htmlFor="address">
+              Pin Code<span className="font-light text-red-600">*</span>
+            </Label>
+            <Input
+              type="text"
+              {...register("pin_code", {
+                valueAsNumber: true,
+              })}
+            />
+            {errors.pin_code && (
+              <p className="text-red-500">{errors.pin_code.message}</p>
             )}
           </div>
           <div className="space-y-2">
@@ -184,7 +219,6 @@ export default function RegisterForm() {
             </Label>
             <Input
               type="file"
-              {...register("photo")}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
@@ -209,23 +243,25 @@ export default function RegisterForm() {
           </div>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
-              <Loader2 className="animate-spin" size={20} />
+              <>
+                <Loader2 className="animate-spin" />{" "}
+                <span className="pl-2">Please Wait..</span>
+              </>
             ) : (
-              "Submit"
+              <>Submit</>
             )}
           </Button>
         </form>
         {errors.root && <p className="text-red-500">Submission Error</p>}
       </div>
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center bg-white">
         <Image
-          src={getValues("photo")}
+          src={"https://static.aaraz.me/payko/money.png"}
           alt="icon"
           height={300}
           width={300}
           className="border-2 border-gray-300 rounded-full object-fill h-[500px] w-[500px]"
         />
-        <h1 className="font-extrabold text-center text-2xl mt-4"></h1>
       </div>
     </div>
   );
