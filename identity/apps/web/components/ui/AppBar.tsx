@@ -39,7 +39,7 @@ function AppBar() {
           Dashboard
         </a>
 
-        {/* wsllet button link */}
+        {/* wallet button link */}
         <a href="">{/* <WalletButton /> */}</a>
       </div>
     </nav>

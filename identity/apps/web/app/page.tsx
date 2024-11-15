@@ -26,28 +26,9 @@ function Home() {
         </p>
       </div>
       <footer>
-        <div></div>
-        <div>
-          <form className="flex flex-col max-w-[450px] gap-2 ml-4 p-4">
-            <h1 className="text-white text-xl font-bold">
-              Submit your queries
-            </h1>
-            <input
-              type="text"
-              placeholder="Enter your name"
-              className="mb-4 px-2 py-2"
-            />
-            <textarea
-              name="message"
-              id="message"
-              placeholder="Message..."
-              className="py-8"
-            ></textarea>
-            <button className="bg-[#16213E] py-2 text-white rounded-md mt-1 mx-24">
-              Submit
-            </button>
-          </form>
-        </div>
+        <section>
+          <div></div>
+        </section>
       </footer>
     </main>
   );
