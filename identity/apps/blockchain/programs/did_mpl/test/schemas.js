@@ -45,6 +45,8 @@ const requestSchema = {
                 { struct: { UpdateSigners: { struct: { signers: { map: { key: 'string', value: 'string' } } } } } },
                 { struct: { UpdateMinimumNumberOfSigns: { struct: { value: "u32" } } } },
                 { struct: { UpdateIdentityCardHash: { struct: { hash: "string" } } } },
+                { struct: { AddAssetHash: { struct: { hash: "string" } } } },
+                { struct: { RemoveAssetHash: { struct: { hash: "string" } } } },
                 { struct: { Delete: { struct: {} } } },
               ],
             },

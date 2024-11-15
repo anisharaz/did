@@ -50,6 +50,7 @@ pub(crate) fn create_card_account(
         bump: multisig_vault_account_bump,
         creator: creator.key.to_owned(),
         identity_card_hash,
+        assets_hash: Vec::new(),
     };
 
     helper::create_pda_account(

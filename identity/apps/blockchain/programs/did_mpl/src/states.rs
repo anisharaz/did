@@ -25,6 +25,7 @@ pub(crate) struct MultiSigVault {
     pub(crate) bump: u8,
     pub(crate) creator: Pubkey,
     pub(crate) identity_card_hash: String,
+    pub(crate) assets_hash: Vec<String>,
 }
 
 #[derive(BorshDeserialize, BorshSerialize, Deserialize, Debug)]
@@ -39,6 +40,12 @@ pub(crate) enum Action {
 
     // Vault
     UpdateIdentityCardHash {
+        hash: String,
+    },
+    AddAssetHash {
+        hash: String,
+    },
+    RemoveAssetHash {
         hash: String,
     },
 

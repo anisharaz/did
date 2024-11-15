@@ -2,6 +2,7 @@ use borsh::BorshDeserialize;
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
+    msg,
 };
 
 use crate::{helper, states};
@@ -48,6 +49,26 @@ pub(crate) fn execute_multisig_action(accounts: &[AccountInfo]) -> ProgramResult
             let mut multising_vault =
                 states::MultiSigVault::try_from_slice(&multisig_vault_account_pda.data.borrow())?;
             multising_vault.identity_card_hash = hash;
+            helper::update_pda_account(executor, multisig_vault_account_pda, multising_vault)?;
+        }
+        states::Action::AddAssetHash { hash } => {
+            let mut multising_vault =
+                states::MultiSigVault::try_from_slice(&multisig_vault_account_pda.data.borrow())?;
+            if multising_vault.assets_hash.contains(&hash) {
+                msg!("Already exists");
+                return Ok(());
+            }
+            multising_vault.assets_hash.push(hash);
+            helper::update_pda_account(executor, multisig_vault_account_pda, multising_vault)?;
+        }
+        states::Action::RemoveAssetHash { hash } => {
+            let mut multising_vault =
+                states::MultiSigVault::try_from_slice(&multisig_vault_account_pda.data.borrow())?;
+            if !multising_vault.assets_hash.contains(&hash) {
+                msg!("Assest does not exist");
+                return Ok(());
+            }
+            multising_vault.assets_hash.retain(|x| *x != hash);
             helper::update_pda_account(executor, multisig_vault_account_pda, multising_vault)?;
         }
         states::Action::UpdateMinimumNumberOfSigns { value } => {
