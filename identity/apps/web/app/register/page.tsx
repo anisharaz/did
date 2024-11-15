@@ -10,6 +10,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { RegisterAction } from "../actions/database";
 import { Loader2 } from "lucide-react";
+
 const formSchema = z.object({
   firstName: z.string().min(2, { message: "This field has to be filled." }),
   middleName: z.string().optional(),

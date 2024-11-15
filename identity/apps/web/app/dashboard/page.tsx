@@ -6,12 +6,29 @@ import { Eye } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 // import WalletButton from "@/components/ui/WalletButton";
 
+type User = {
+  first_name: String;
+  last_name: String;
+  address_line: String;
+  phone: String;
+  email: String;
+  city: String;
+  state: String;
+  dob: Date;
+  pin_code: Number;
+  id: Number;
+  verification_complete: boolean;
+  gender: enum;
+  pub_key: String;
+  created_at: Date;
+};
+
 export default function LandingPage() {
   const { publicKey, connected, signMessage, connect } = useWallet();
 
-  const [isDocumentedAdded, setIsDocumentAdded] = useState(false);
-  const [isDocumentViewed, setIsDocumentViewed] = useState(false);
-  const [userDetails, setUserDetails] = useState({});
+  const [isDocumentedAdded, setIsDocumentAdded] = useState<boolean>(false);
+  const [isDocumentViewed, setIsDocumentViewed] = useState<boolean>(false);
+  const [userDetails, setUserDetails] = useState<User>();
 
   const fetchUserData = async () => {
     if (!connected) {
@@ -21,14 +38,11 @@ export default function LandingPage() {
     if (publicKey && signMessage) {
       try {
         const publicKeyString = publicKey.toString();
-        console.log("Public Key:", publicKeyString);
 
         const userData_At_LocalStorage = localStorage.getItem("user");
         if (userData_At_LocalStorage) {
-          console.log(
-            "User Data from Local Storage:",
-            userData_At_LocalStorage
-          );
+          const userData = JSON.parse(userData_At_LocalStorage);
+          setUserDetails(userData);
           return;
         }
 
@@ -36,7 +50,7 @@ export default function LandingPage() {
           new TextEncoder().encode(publicKeyString)
         );
 
-        const response = await fetch("http://localhost:3000/api/getuser", {
+        const response = await fetch(`${process.env.BASE_URL}/api/getuser`, {
           method: "POST",
           body: JSON.stringify({
             public_key: publicKeyString,
@@ -48,7 +62,6 @@ export default function LandingPage() {
           const data = await response.json();
           console.log("User Data from API:", data);
           setUserDetails(data);
-
           localStorage.setItem("user", JSON.stringify(data));
         } else {
           console.error("Failed to fetch user data:", await response.text());
@@ -58,10 +71,28 @@ export default function LandingPage() {
       }
     }
   };
+  console.log(userDetails);
+
+  const {
+    first_name,
+    last_name,
+    address_line,
+    phone,
+    email,
+    city,
+    state,
+    dob,
+    pin_code,
+    id,
+    verification_complete,
+    gender,
+    pub_key,
+    created_at,
+  } = userDetails;
 
   useEffect(() => {
     fetchUserData();
-  }, []);
+  }, [connected]);
 
   return (
     <main>
@@ -103,11 +134,13 @@ export default function LandingPage() {
             className="rounded-full h-36 border-gray"
           />
           <div className="flex flex-col gap-2">
-            <h2 className="text-2xl font-bold">John Doe</h2>
-            <p>Male</p>
+            <h2 className="text-2xl font-bold">
+              <span className="mr-2 capitalize">{first_name}</span>
+              <span className="capitalize">{last_name}</span>
+            </h2>
+            <p className="capitalize">{gender}</p>
           </div>
         </section>
-        {/* Personal Information */}
         {!isDocumentViewed && !isDocumentedAdded ? (
           <>
             {/* Personal Information */}
@@ -115,25 +148,25 @@ export default function LandingPage() {
               <h2 className="text-xl font-bold mt-4 mb-2">
                 Personal Information
               </h2>
-              <div className="text-gray-600">
-                <div className="flex gap-80 ml-1">
+              <div className="text-gray-600 flex gap-40 grid-cols-2">
+                <div className="flex flex-col gap-4 ml-1 grid-cols-1">
                   <div>
-                    <p className="mb-2">First Name</p>
-                    <span>John</span>
+                    <p className="mb-2">Name</p>
+                    <span className="capitalize">{first_name}</span>
                   </div>
-                  <div>
-                    <p className="mb-2">Last Name</p>
-                    <span>Doe</span>
-                  </div>
-                </div>
-                <div className="flex gap-52 mt-6">
                   <div>
                     <p className="mb-2">Email</p>
-                    <span>johndoe12@gmail.com</span>
+                    <span>{email}</span>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-4 grid-cols-1">
+                  <div>
+                    <p className="mb-2">Last Name</p>
+                    <span className="capitalize">{last_name}</span>
                   </div>
                   <div>
                     <p className="mb-2">Phone</p>
-                    <span>+91-8738236233</span>
+                    <span>{phone}</span>
                   </div>
                 </div>
               </div>
@@ -143,26 +176,25 @@ export default function LandingPage() {
               <h2 className="text-xl font-bold mt-4 mb-2">
                 Address Information
               </h2>
-              <div className="text-gray-600">
-                <div className="flex gap-60">
-                  <div className="flex flex-col">
-                    <p className="mb-2">Address </p>
-                    <span>Jain Global Campus</span>
+              <div className="text-gray-600 flex gap-40 grid-cols-2">
+                <div className="flex flex-col gap-4 ml-1 grid-cols-1">
+                  <div>
+                    <p className="mb-2">Address</p>
+                    <span>{address_line}</span>
                   </div>
-                  <div className="flex flex-col">
-                    <p className="mb-2">City</p>
-                    <span>Bengaluru</span>
+                  <div>
+                    <p className="mb-2">State</p>
+                    <span>{state}</span>
                   </div>
                 </div>
-                <div className="flex gap-80 mt-6">
-                  <div className="flex flex-col">
-                    <p>State</p>
-                    <span>Karnataka</span>
+                <div className="flex flex-col gap-4 grid-cols-1">
+                  <div>
+                    <p className="mb-2">City</p>
+                    <span>{city}</span>
                   </div>
-
-                  <div className="flex flex-col ml-1">
-                    <p>Pincode</p>
-                    <span>562112</span>
+                  <div>
+                    <p className="mb-2">Pincode</p>
+                    <span>{pin_code}</span>
                   </div>
                 </div>
               </div>
@@ -170,26 +202,28 @@ export default function LandingPage() {
 
             {/* Security Details */}
             <section className="flex flex-col gap-1 border border-gray rounded-xl py-4 px-4 mb-4">
-              <h2 className="text-xl font-bold mb-3">Security Details</h2>
-              <div className="text-gray-600">
-                <div className="flex gap-52">
-                  <div className="flex flex-col gap-2">
-                    <p>Public Key</p>
-                    <span>basdkbjsdsjdasbdkjad</span>
+              <h2 className="text-xl font-bold mt-4 mb-2">Security Details</h2>
+              <div className="text-gray-600 flex gap-40 grid-cols-2">
+                <div className="flex flex-col gap-4 ml-1 grid-cols-1">
+                  <div>
+                    <p className="mb-2">Public Key</p>
+                    <span>{pub_key}</span>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <p>Verification Status</p>
-                    <span>verified</span>
+                  <div>
+                    <p className="mb-2">Verification ID</p>
+                    <span>{id}</span>
                   </div>
                 </div>
-                <div className="flex gap-52 ml-1 mt-6">
-                  <div className="flex flex-col gap-2">
-                    <p>Verification Id</p>
-                    <span>289378928dbdhbd2o</span>
+                <div className="flex flex-col gap-4 grid-cols-1">
+                  <div>
+                    <p className="mb-2">Verification Status</p>
+                    <span>
+                      {verification_complete ? "verified" : "not verified"}
+                    </span>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <p>Created At</p>
-                    <span>20-10-2024</span>
+                  <div>
+                    <p className="mb-2">Created At</p>
+                    <span>{created_at.substring(0, 10)}</span>
                   </div>
                 </div>
               </div>
