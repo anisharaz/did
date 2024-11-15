@@ -3,13 +3,8 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: "Gunmetal";
-  src: url("../public/gunmetl.ttf"); /* IE9 Compat Modes */
-}
-
-@font-face {
   font-family: "Round Digitalio Expanded";
-  src: url("../public/round-digitalio-expanded.ttf"); /* IE9 Compat Modes */
+  src: url("./fonts/round-digitalio-expanded.ttf"); /* IE9 Compat Modes */
 }
 
 @layer base {
