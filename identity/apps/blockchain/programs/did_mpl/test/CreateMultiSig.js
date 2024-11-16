@@ -15,6 +15,7 @@ const programId = new PublicKey(process.env.PROG);
 const connection = new Connection("http://localhost:8899", "confirmed");
 
 const keyPair = await getKeypairFromFile("~/.config/solana/id.json");
+const keyPair2 = await getKeypairFromFile("testacc.json");
 
 const blockhashInfo = await connection.getLatestBlockhash();
 
@@ -38,6 +39,7 @@ const [multisig_vault_account_pda, multisig_vault_account_bump] = PublicKey.find
 const data = {
   CreateMultiSig: {
     permissions: [
+      [{ Initiate: {} }, { Vote: {} }, { Execute: {} },],
       [{ Initiate: {} }, { Vote: {} }, { Execute: {} },],
     ],
     minimum_number_of_signs_for_update: 1,
@@ -74,6 +76,11 @@ try {
           pubkey: multisig_vault_account_pda,
           isSigner: false,
           isWritable: true,
+        },
+        {
+          pubkey: keyPair2.publicKey,
+          isSigner: false,
+          isWritable: false,
         },
         {
           pubkey: SystemProgram.programId,

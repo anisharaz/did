@@ -44,6 +44,7 @@ pub(crate) fn init_multisig_action(
     helper::create_pda_account(
         program_id,
         &creator,
+        None,
         &multisig_action_account_pda,
         multisig_action_account_bump,
         b"multisig_action_account_pda",
@@ -68,6 +69,7 @@ pub(crate) fn init_multisig_action(
     helper::create_pda_account(
         program_id,
         &creator,
+        None,
         &multisig_voting_account_pda,
         multisig_voting_account_bump,
         b"multisig_voting_account_pda",
@@ -88,6 +90,7 @@ pub(crate) fn init_multisig_action(
         helper::create_pda_account(
             program_id,
             &creator,
+            Some(multisig.creator.clone()),
             &in_progress_multisig_account_pda,
             in_progress_multisig_account_bump,
             b"in_progress_multisig_account_pda",

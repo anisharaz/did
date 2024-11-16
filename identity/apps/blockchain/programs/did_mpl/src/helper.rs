@@ -13,6 +13,7 @@ use std::cell::RefCell;
 pub(crate) fn create_pda_account<'a, W: BorshSerialize>(
     program_id: &Pubkey,
     signer: &AccountInfo<'a>,
+    non_signer_as_seed: Option<Pubkey>,
     account_pda: &AccountInfo<'a>,
     bump: u8,
     extra_seed: &[u8],
@@ -21,6 +22,11 @@ pub(crate) fn create_pda_account<'a, W: BorshSerialize>(
 ) -> ProgramResult {
     let data_span = (borsh::to_vec(&data)?).len();
     let lamports_required = (Rent::get()?).minimum_balance(data_span);
+
+    let seed_key = match non_signer_as_seed {
+        Some(a) => a,
+        None => signer.key.to_owned(),
+    };
 
     if let Some(seed) = optional_seed {
         invoke_signed(
@@ -32,7 +38,7 @@ pub(crate) fn create_pda_account<'a, W: BorshSerialize>(
                 program_id,
             ),
             &[signer.clone(), account_pda.clone()],
-            &[&[signer.key.as_ref(), extra_seed, seed, &[bump]]],
+            &[&[seed_key.as_ref(), extra_seed, seed, &[bump]]],
         )?;
     } else {
         invoke_signed(
@@ -44,7 +50,7 @@ pub(crate) fn create_pda_account<'a, W: BorshSerialize>(
                 program_id,
             ),
             &[signer.clone(), account_pda.clone()],
-            &[&[signer.key.as_ref(), extra_seed, &[bump]]],
+            &[&[seed_key.as_ref(), extra_seed, &[bump]]],
         )?;
     }
 

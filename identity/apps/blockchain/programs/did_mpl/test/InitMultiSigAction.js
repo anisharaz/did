@@ -19,6 +19,7 @@ const programId = new PublicKey(process.env.PROG);
 const connection = new Connection("http://localhost:8899", "confirmed");
 
 const keyPair = await getKeypairFromFile("~/.config/solana/id.json");
+const keyPair2 = await getKeypairFromFile("testacc.json");
 
 const blockhashInfo = await connection.getLatestBlockhash();
 
@@ -34,13 +35,13 @@ const [multisig_account_pda, multisig_account_bump] = PublicKey.findProgramAddre
 
 const [multisig_action_account_pda, multisig_action_account_bump] = PublicKey.findProgramAddressSync(
   // Public key of Proposer 
-  [keyPair.publicKey.toBuffer(), "multisig_action_account_pda", "action_id<prefered uuid>"],
+  [keyPair2.publicKey.toBuffer(), "multisig_action_account_pda", "action_id<prefered uuid>"],
   programId,
 );
 
 const [multisig_voting_account_pda, multisig_voting_account_bump] = PublicKey.findProgramAddressSync(
   // Public key of Proposer 
-  [keyPair.publicKey.toBuffer(), "multisig_voting_account_pda", "action_id<prefered uuid>"],
+  [keyPair2.publicKey.toBuffer(), "multisig_voting_account_pda", "action_id<prefered uuid>"],
   programId,
 );
 
@@ -64,7 +65,7 @@ const encoded = borsh.serialize(requestSchema, data);
 
 
 console.log("Data:", encoded);
-console.log("Keys:", keyPair.publicKey.toBase58());
+console.log("Keys:", keyPair2.publicKey.toBase58());
 
 try {
 
@@ -74,7 +75,7 @@ try {
       programId: programId,
       keys: [
         {
-          pubkey: keyPair.publicKey,
+          pubkey: keyPair2.publicKey,
           isSigner: true,
           isWritable: true,
         },
@@ -99,6 +100,11 @@ try {
           isWritable: true,
         },
         {
+          pubkey: keyPair.publicKey,
+          isSigner: false,
+          isWritable: false,
+        },
+        {
           pubkey: SystemProgram.programId,
           isSigner: false,
           isWritable: false,
@@ -108,7 +114,7 @@ try {
     }),
   );
 
-  tx.sign(keyPair);
+  tx.sign(keyPair2);
 
 
   const txHash = await connection.sendRawTransaction(tx.serialize());
@@ -124,6 +130,9 @@ try {
   console.log(`https://explorer.solana.com/tx/${txHash}?cluster=custom`);
 
 } catch (e) {
+  console.log("Error:")
+  console.log(e)
+  console.log("Trying to get log:")
   console.log(await e.getLogs())
 }
 
