@@ -10,10 +10,6 @@ import * as borsh from "borsh";
 import { requestSchema } from "./schemas.js";
 import * as process from "process";
 
-/*
- * Notification about proposal can be sent offchain by client
- */
-
 const programId = new PublicKey(process.env.PROG);
 
 const connection = new Connection("http://localhost:8899", "confirmed");
@@ -33,11 +29,6 @@ const [multisig_account_pda, multisig_account_bump] = PublicKey.findProgramAddre
   programId,
 );
 
-const [multisig_action_account_pda, multisig_action_account_bump] = PublicKey.findProgramAddressSync(
-  // Public key of Proposer 
-  [keyPair2.publicKey.toBuffer(), "multisig_action_account_pda", "action_id<prefered uuid>"],
-  programId,
-);
 
 const [multisig_voting_account_pda, multisig_voting_account_bump] = PublicKey.findProgramAddressSync(
   // Public key of Proposer 
@@ -45,19 +36,10 @@ const [multisig_voting_account_pda, multisig_voting_account_bump] = PublicKey.fi
   programId,
 );
 
-const [in_progress_multisig_account_pda, in_progress_multisig_account_bump] = PublicKey.findProgramAddressSync(
-  // Public key of owner of Multisig 
-  [keyPair.publicKey.toBuffer(), "in_progress_multisig_account_pda"],
-  programId,
-);
 
 const data = {
-  InitMultiSigAction: {
-    action_id: "action_id<prefered uuid>",
-    action: { UpdateMinimumNumberOfSigns: { value: 2 } },
-    multisig_action_account_bump: multisig_action_account_bump,
-    multisig_voting_account_bump: multisig_voting_account_bump,
-    in_progress_multisig_account_bump: in_progress_multisig_account_bump,
+  VoteMultiSigAction: {
+    vote: true
   },
 };
 
@@ -65,7 +47,7 @@ const encoded = borsh.serialize(requestSchema, data);
 
 
 console.log("Data:", encoded);
-console.log("Keys:", keyPair2.publicKey.toBase58());
+console.log("Keys:", keyPair.publicKey.toBase58());
 
 try {
 
@@ -75,22 +57,12 @@ try {
       programId: programId,
       keys: [
         {
-          pubkey: keyPair2.publicKey,
+          pubkey: keyPair.publicKey,
           isSigner: true,
           isWritable: true,
         },
         {
-          pubkey: multisig_action_account_pda,
-          isSigner: false,
-          isWritable: true,
-        },
-        {
           pubkey: multisig_voting_account_pda,
-          isSigner: false,
-          isWritable: true,
-        },
-        {
-          pubkey: in_progress_multisig_account_pda,
           isSigner: false,
           isWritable: true,
         },
@@ -100,10 +72,11 @@ try {
           isWritable: true,
         },
         {
-          pubkey: keyPair.publicKey,
+          pubkey: keyPair2.publicKey,
           isSigner: false,
           isWritable: false,
         },
+
         {
           pubkey: SystemProgram.programId,
           isSigner: false,
@@ -114,7 +87,7 @@ try {
     }),
   );
 
-  tx.sign(keyPair2);
+  tx.sign(keyPair);
 
 
   const txHash = await connection.sendRawTransaction(tx.serialize());
@@ -130,9 +103,6 @@ try {
   console.log(`https://explorer.solana.com/tx/${txHash}?cluster=custom`);
 
 } catch (e) {
-  console.log("Error:")
-  console.log(e)
-  console.log("Trying to get log:")
   console.log(await e.getLogs())
 }
 

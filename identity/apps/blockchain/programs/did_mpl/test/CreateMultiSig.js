@@ -42,7 +42,7 @@ const data = {
       [{ Initiate: {} }, { Vote: {} }, { Execute: {} },],
       [{ Initiate: {} }, { Vote: {} }, { Execute: {} },],
     ],
-    minimum_number_of_signs_for_update: 1,
+    minimum_number_of_signs_for_update: 2,
     identity_card_hash: "123456789",
     multisig_account_bump,
     multisig_vault_account_bump
